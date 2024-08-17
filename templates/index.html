@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Personal Finance Manager</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Welcome to Personal Finance Manager</h1>
+    <form id="transaction-form">
+        <input type="text" id="category" placeholder="Category">
+        <input type="number" id="amount" placeholder="Amount">
+        <input type="date" id="transaction-date">
+        <input type="text" id="description" placeholder="Description">
+        <button type="submit">Add Transaction</button>
+        <button type="button" id="clear-button">Clear</button>
+    </form>
+    <form id="options-form">
+        <button id="report-button" type="button">Report</button>
+        <button id="transactions-button" type="button">Transactions</button>
+    </form>
+    <div id="budget-report"></div>
+    <script>
+        document.getElementById('transaction-form').onsubmit = function(event) {
+            event.preventDefault();
+            let category = document.getElementById('category').value;
+            let amount = document.getElementById('amount').value;
+            let date = document.getElementById('transaction-date').value;
+            let description = document.getElementById('description').value;
+            fetch('/add_transaction', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({category: category, amount: amount, date: date, description: description})
+            }).then(response => response.json())
+            .then(data => alert('Transaction added!'));
+        };
+
+        let today = new Date().toISOString().substring(0, 10);
+        document.getElementById('transaction-date').value = today;
+        
+        document.getElementById('clear-button').addEventListener('click', function(event) {
+            event.preventDefault();
+            document.getElementById('transaction-form').reset();
+            let today = new Date().toISOString().substring(0, 10);
+            document.getElementById('transaction-date').value = today;
+        });
+
+        document.getElementById('report-button').addEventListener('click', function(event) {
+            event.preventDefault();
+            window.location.href = 'http://127.0.0.1:5000/budget';
+        });
+
+        document.getElementById('transactions-button').addEventListener('click', function(event) {
+            event.preventDefault();
+            window.location.href = 'http://127.0.0.1:5000/transactions';
+        });
+    </script>
+</body>
+</html>

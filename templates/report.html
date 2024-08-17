@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Budget Report</title>
+</head>
+<body>
+    <h1>Budget Report</h1>
+    <a href="http://127.0.0.1:5000/">
+        <button>🏠</button>
+    </a>
+    <div>
+<label for="from-date">From:</label>
+<input type="date" id="from-date">
+<label for="to-date">To:</label>
+<input type="date" id="to-date">
+<button id="filter-button">Filter</button>
+<button id="clear-button">Clear</button>
+</div>
+<iframe src="static/budget_report.html" width="100%" height="600"></iframe>
+<script>
+    let now = new Date();
+
+    let firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    document.getElementById('from-date').value = firstDay.toISOString().substring(0, 10);
+
+    let lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    document.getElementById('to-date').value = lastDay.toISOString().substring(0, 10);
+
+    document.getElementById('filter-button').addEventListener('click', function() {
+        let fromDate = document.getElementById('from-date').value;
+        let toDate = document.getElementById('to-date').value;
+
+        fetch('/budget', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({from: fromDate, to: toDate})
+        })
+        .then(() => {
+            let iframe = document.querySelector('iframe');
+            iframe.src = "static/budget_report.html?t=" + new Date().getTime();
+        });
+    });
+
+    document.getElementById('clear-button').addEventListener('click', function() {
+        window.location.href = 'http://127.0.0.1:5000/budget';
+    });
+</script>

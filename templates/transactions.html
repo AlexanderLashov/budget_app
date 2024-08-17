@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Transaction History</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Transaction History</h1>
+        <a href="http://127.0.0.1:5000/">
+            <button>🏠</button>
+        </a>
+        <label for="from-date">Date from:</label>
+        <input type="date" id="from-date">
+        <label for="to-date">Date to:</label>
+        <input type="date" id="to-date">
+        <button id="filter-button">Filter</button>
+        <button id="clear-button">Clear</button>
+        <p id="total">Total for selected period: $0</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in transactions %}
+                <tr>
+                    <td>{{ transaction.date }}</td>
+                    <td>{{ transaction.category }}</td>
+                    <td>${{ transaction.amount }}</td>
+                    <td>{{ transaction.description }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4">No transactions available</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        let today = new Date();
+        document.getElementById('from-date').value = today.toISOString().substring(0, 10);
+        document.getElementById('to-date').value = today.toISOString().substring(0, 10);
+
+        document.getElementById('filter-button').addEventListener('click', function() {
+            let fromDate = document.getElementById('from-date').value;
+            let toDate = document.getElementById('to-date').value;
+
+            fetch('/get_transactions', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({from: fromDate, to: toDate})
+            })
+            .then(response => response.json())
+            .then(data => {
+                    let tableBody = document.querySelector('table tbody');
+                    tableBody.innerHTML = '';
+
+                    let total = 0;
+                    data.transactions.forEach(transaction => {
+                        total += Number(transaction.amount);
+
+                        let row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${transaction.date}</td>
+                            <td>${transaction.category}</td>
+                            <td>$${transaction.amount}</td>
+                            <td>${transaction.description}</td>
+                        `;
+                        tableBody.insertBefore(row, tableBody.firstChild);
+                    });
+
+                    document.getElementById('total').textContent = `Total for selected period: $${total}`;
+                });
+            });
+        document.getElementById('clear-button').addEventListener('click', function() {
+            window.location.href = '/transactions';
+        });
+    </script>    
+</body>
+</html>

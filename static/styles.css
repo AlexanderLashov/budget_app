@@ -1,0 +1,29 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+form {
+    margin: 20px 0;
+}
+
+input, button {
+    margin: 5px;
+    padding: 10px;
+}
+
+table tr {
+    height: 40px;
+}
+
+table td{
+    width: 400px;
+}
+
+table th {
+    background-color: #f2f2f2;
+    height: 40px;
+}
+
+table td, table th {
+    border: 1px solid #f2f2f2;
+}
